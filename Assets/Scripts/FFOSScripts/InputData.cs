@@ -60,8 +60,15 @@ public class InputData : MonoBehaviour
 
     public Vector3 GetHMDPosition()
     {
-        Vector3 value;
+        Vector3 value = Vector3.zero;
         HMD.TryGetFeatureValue(CommonUsages.devicePosition, out value);
+        return value;
+    }
+
+    public Vector3 GetHMDVelocity()
+    {
+        Vector3 value = Vector3.zero;
+        HMD.TryGetFeatureValue(CommonUsages.deviceVelocity, out value);
         return value;
     }
 

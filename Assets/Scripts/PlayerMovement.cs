@@ -3,16 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
 public class PlayerMovement : MonoBehaviour
 {
-    private Vector3 startPos;
+    [SerializeField] private Rigidbody rb;
+    [SerializeField] private MotionbodySO so;
+
+    private float curAccel;
+    private Vector3 horzAccel;
+    private Vector3 horzVel;
+    private float curMaxHorzVel;
     
+    
+    // Inputs
+    private Vector3 startPos;
     private bool moveInputActive;
     private bool prevMoveInputActive;
+    private Vector3 direction;
+    private Vector3 horzDirection;
 
-    private Vector3 headTiltInput;
-
-    private Vector3 horzVel;
 
     // Start is called before the first frame update
     void Start()
@@ -27,34 +36,66 @@ public class PlayerMovement : MonoBehaviour
         Move();
     }
 
+    void CalcHorzAccel()
+    {
+        curMaxHorzVel = so.grMaxHorzVel;
+        
+        if (horzDirection.magnitude > 0)
+        {
+            curAccel = so.runAccel;
+        }
+        else
+        {
+            curAccel = 0;
+        }
+
+        horzAccel = curAccel * horzDirection;
+    }
+
+    void CalcHorzVel()
+    {
+        horzVel += horzAccel;
+        horzVel = Vector3.ClampMagnitude(horzVel, curMaxHorzVel);
+    }
+
+    void CalcFriction()
+    {
+        if (horzDirection.magnitude == 0)
+        {
+            if (horzVel.magnitude > so.grFriction)
+            {
+                horzVel -= so.grFriction * horzVel.normalized;
+            }
+            else
+            {
+                horzVel = Vector3.zero;
+            }
+        }
+
+    }
+
     void Move()
     {
-        if (moveInputActive)
-        { 
-            horzVel = headTiltInput;
-            horzVel.y = 0;
-
-            transform.position += Time.deltaTime * horzVel;
-        }
+        CalcHorzAccel();
+        CalcHorzVel();
+        CalcFriction();
+        rb.position += (Time.fixedDeltaTime) * horzVel;
     }
 
     void GetInput()
     {
-        GetLeftButton();
-
-        if (moveInputActive)
-        {
-            GetHeadTilt();
-        }
+        GetRightButton();
+        GetHeadTilt();
     }
 
 
-    void GetLeftButton()
+    void GetRightButton()
     {
         moveInputActive = InputData.Data.GetRightButton();
 
         if (prevMoveInputActive != moveInputActive)
         {
+            print("button pressed");
             startPos = InputData.Data.GetHMDPosition();
         }
         prevMoveInputActive = moveInputActive;
@@ -62,6 +103,14 @@ public class PlayerMovement : MonoBehaviour
 
     void GetHeadTilt()
     {
-        headTiltInput = (InputData.Data.GetHMDPosition() - startPos);
+        if (moveInputActive)
+        {
+            direction = Vector3.ClampMagnitude(InputData.Data.GetHMDPosition() - startPos,1.0f);
+            horzDirection = direction;
+            horzDirection.y = 0;
+        } else 
+        {
+            direction = horzDirection = Vector3.zero;
+        }
     }
 }
