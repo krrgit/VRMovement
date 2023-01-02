@@ -864,6 +864,7 @@ GameObject:
   - component: {fileID: 1193332429}
   - component: {fileID: 1193332432}
   - component: {fileID: 1193332433}
+  - component: {fileID: 1193332434}
   m_Layer: 8
   m_Name: XR Origin
   m_TagString: Untagged
@@ -896,7 +897,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1193332424}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1000,13 +1001,34 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  speed: 5
-  fullJumpThreshold: 1.1
-  fastFallThreshold: -1.25
-  fullJumpInitVel: 1
-  jumpMultiplier: 10
-  fastFallGravity: 98
-  maxJumps: 1
+  grAccel: 1.435
+  grFriction: 0.8
+  grMaxHorzVel: 3
+  airAccel: 1.435
+  airFriction: 0
+  airMaxHorzVel: 3
+  curAccel: 1.435
+  curFriction: 0.8
+  curMaxHorzVel: 3
+--- !u!114 &1193332434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1193332424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88f5f0391db269449b863f4c67f1c5f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  input: {fileID: 809931450}
+  cc: {fileID: 1193332428}
+  fullJumpThreshold: 0.75
+  fastFallThreshold: -1.5
+  jumpMultiplier: 8
+  fastFallGravity: 21
+  maxJumps: 2
   vertVelocity: {x: 0, y: 0, z: 0}
 --- !u!4 &1210724310 stripped
 Transform:

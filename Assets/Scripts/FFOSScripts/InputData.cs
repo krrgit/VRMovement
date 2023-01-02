@@ -58,6 +58,13 @@ public class InputData : MonoBehaviour
         return value;
     }
 
+    public float getRightTrigger()
+    {
+        float value = 0.0f;
+        RightController.TryGetFeatureValue(CommonUsages.trigger, out value);
+        return value;
+    }
+
     public Vector3 GetHMDPosition()
     {
         Vector3 value = Vector3.zero;
