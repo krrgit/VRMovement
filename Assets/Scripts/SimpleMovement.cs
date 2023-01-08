@@ -45,19 +45,21 @@ public class SimpleMovement : MonoBehaviour
             curFriction = airFriction;
             curMaxHorzVel = airMaxHorzVel;
         }
+
+        curMaxHorzVel *= InputData.Data.getRightTrigger();
     }
 
     void Move()
     {
         if (cc.isGrounded)
         {
-            horzAccel = curAccel * InputData.Data.getRightTrigger() * input.HorzDirection;
+            horzAccel = curAccel * InputData.Data.getRightTrigger() * Time.fixedDeltaTime * input.HorzDirection;
+            horzVel = Vector3.ClampMagnitude(horzVel, curMaxHorzVel - horzAccel.magnitude);
             horzVel += horzAccel;
             
             ClampHorzVel();
-            Friction();
         }
-            
+        Friction();
 
         cc.Move(horzVel * Time.fixedDeltaTime);
     }
@@ -67,10 +69,11 @@ public class SimpleMovement : MonoBehaviour
         if (horzVel.magnitude > curMaxHorzVel)
         {
             horzVel = Vector3.ClampMagnitude(horzVel, horzVel.magnitude - Mathf.Min(horzVel.magnitude - curMaxHorzVel, grFriction));
+            horzAccel = Vector3.zero;
         } 
         else
         {
-            horzVel = Vector3.ClampMagnitude(horzVel, curMaxHorzVel);
+            horzVel = Vector3.ClampMagnitude(horzVel, curMaxHorzVel - horzAccel.magnitude);
         }
     }
 

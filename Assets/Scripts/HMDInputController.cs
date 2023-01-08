@@ -22,7 +22,7 @@ public class HMDInputController : MonoBehaviour
 
     public float VertVelocity
     {
-        get { return vertVel;  }
+        get { return InputData.Data.GetHMDVelocity().y;;  }
     }
     public Vector3 HorzDirection
     {

@@ -10,6 +10,7 @@ public class JumpMovement : MonoBehaviour
     [SerializeField] private float fastFallThreshold = -0.5f;
     [SerializeField] private float jumpMultiplier = 5f;
     [SerializeField] private float fastFallGravity = 18.6f;
+    [SerializeField] private float gravity = 9.81f;
     [SerializeField] private int maxJumps = 2;
 
     public Vector3 vertVelocity;
@@ -34,7 +35,6 @@ public class JumpMovement : MonoBehaviour
     // Get the max velocity in a given direction
     void MaxDirVel()
     {
-
         if ((input.VertVelocity > 0 && curVertSign > 0) || (input.VertVelocity < 0 && curVertSign < 0))
         {
             curMaxVertVel = Mathf.Max(Mathf.Abs(input.VertVelocity), curMaxVertVel);
@@ -46,28 +46,37 @@ public class JumpMovement : MonoBehaviour
             curVertSign = Mathf.Sign(input.VertVelocity);
         }
     }
-    
-    
+
     void Jump()
     {
+        //if (!cc.isGrounded && !bufferJump) return;
         if (curJumps == maxJumps) return;
-        if (!cc.isGrounded && !bufferJump) return;
         
         // Check headset moves fast enough to trigger jump action
-        if (input.VertVelocity > fullJumpThreshold)
+        if (!bufferJump && input.VertVelocity > fullJumpThreshold)
         {
             bufferJump = true;
+            print("buffer");
         }
         
-        // Once headset velocity is slower than max, trigger jump
-        if (bufferJump && Mathf.Abs(input.VertVelocity) < curMaxVertVel)
+        if (bufferJump)
         {
-            vertVelocity = curMaxVertVel * jumpMultiplier * Time.deltaTime * Vector3.up;
-            print("Jump");
-            bufferJump = false;
-            ++curJumps;
+            // Every frame we move faster than the previous, add velocity
+            if (Mathf.Abs(input.VertVelocity) >= curMaxVertVel)
+            {
+                vertVelocity += (Mathf.Abs(input.VertVelocity) + (gravity * Time.fixedDeltaTime))* jumpMultiplier * Time.fixedDeltaTime * Vector3.up;
+                print("Jumping");
+            } // When we stop increasing velocity, stop adding
+            else
+            {
+                print("buffer stop");
+                bufferJump = false;
+                ++curJumps;
+            }
+            
         }
     }
+    
 
     void FastFall()
     {
@@ -83,19 +92,20 @@ public class JumpMovement : MonoBehaviour
     void Gravity()
     {
         if (!cc.isGrounded)
-            vertVelocity -= (isFastFall ? fastFallGravity :  9.8f) * Time.fixedDeltaTime * Time.fixedDeltaTime * Vector3.up;
-
-        cc.Move(vertVelocity);
+        {
+            vertVelocity -= (isFastFall ? fastFallGravity :  gravity)  * Time.fixedDeltaTime * Time.fixedDeltaTime * Vector3.up;
+            cc.Move(vertVelocity);
+        }
+            
     }
 
     void LandCheck()
     {
         if (cc.isGrounded && vertVelocity.y < 0)
         {
-            print("Land");
-            vertVelocity.y = -Mathf.Epsilon;
-            isFastFall = false;
+            vertVelocity = Vector3.zero;
             curJumps = 0;
         }
+        //print(cc.isGrounded ? "GROUNDED" : "NOT GROUNDED");
     }
 }
