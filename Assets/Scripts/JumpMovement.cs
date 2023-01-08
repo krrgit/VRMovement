@@ -12,15 +12,26 @@ public class JumpMovement : MonoBehaviour
     [SerializeField] private float fastFallGravity = 18.6f;
     [SerializeField] private float gravity = 9.81f;
     [SerializeField] private int maxJumps = 2;
-
+    
+    // Vertical Movement Values
     public Vector3 vertVelocity;
     private float curVertSign;
     private float curMaxVertVel;
     
+    // Jump Values
     private bool bufferJump;
     private bool isFastFall;
     private int curJumps;
 
+
+    public bool UseGravity; // Only to be used by outside components
+
+
+    public void ToggleGravity(bool state)
+    {
+        UseGravity = state;
+        vertVelocity = Vector3.zero;
+    }
 
     // Update is called once per frame
     void FixedUpdate()
@@ -91,7 +102,7 @@ public class JumpMovement : MonoBehaviour
 
     void Gravity()
     {
-        if (!cc.isGrounded)
+        if (!cc.isGrounded && UseGravity)
         {
             vertVelocity -= (isFastFall ? fastFallGravity :  gravity)  * Time.fixedDeltaTime * Time.fixedDeltaTime * Vector3.up;
             cc.Move(vertVelocity);
@@ -105,6 +116,7 @@ public class JumpMovement : MonoBehaviour
         {
             vertVelocity = Vector3.zero;
             curJumps = 0;
+            isFastFall = false;
         }
         //print(cc.isGrounded ? "GROUNDED" : "NOT GROUNDED");
     }

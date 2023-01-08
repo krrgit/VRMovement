@@ -58,10 +58,17 @@ public class InputData : MonoBehaviour
         return value;
     }
 
-    public float getRightTrigger()
+    public float GetRightTrigger()
     {
         float value = 0.0f;
         RightController.TryGetFeatureValue(CommonUsages.trigger, out value);
+        return value;
+    }
+
+    public bool GetRightGripButton()
+    {
+        bool value;
+        RightController.TryGetFeatureValue(CommonUsages.gripButton, out value);
         return value;
     }
 
@@ -76,6 +83,13 @@ public class InputData : MonoBehaviour
     {
         Vector3 value = Vector3.zero;
         HMD.TryGetFeatureValue(CommonUsages.deviceVelocity, out value);
+        return value;
+    }
+
+    public Vector3 GetRightHandVelocity()
+    {
+        Vector3 value = Vector3.zero;
+        RightController.TryGetFeatureValue(CommonUsages.deviceVelocity, out value);
         return value;
     }
 

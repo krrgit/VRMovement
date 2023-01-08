@@ -24,6 +24,11 @@ public class SimpleMovement : MonoBehaviour
     [SerializeField] private float curMaxHorzVel = 6;
     private Vector3 horzAccel;
     private Vector3 horzVel;
+    
+    public void SetHorzVelocity(Vector3 vel)
+    {
+        horzVel = vel;
+    }
 
     private void FixedUpdate()
     {
@@ -46,14 +51,14 @@ public class SimpleMovement : MonoBehaviour
             curMaxHorzVel = airMaxHorzVel;
         }
 
-        curMaxHorzVel *= InputData.Data.getRightTrigger();
+        curMaxHorzVel *= InputData.Data.GetRightTrigger();
     }
 
     void Move()
     {
         if (cc.isGrounded)
         {
-            horzAccel = curAccel * InputData.Data.getRightTrigger() * Time.fixedDeltaTime * input.HorzDirection;
+            horzAccel = curAccel * InputData.Data.GetRightTrigger() * Time.fixedDeltaTime * input.HorzDirection;
             horzVel = Vector3.ClampMagnitude(horzVel, curMaxHorzVel - horzAccel.magnitude);
             horzVel += horzAccel;
             
