@@ -6,6 +6,7 @@ using UnityEngine;
 public enum AirDashState
 {
     Idle,
+    Buffer,
     Accel,
     SlowDown
 }
@@ -15,11 +16,26 @@ public class AirDashMovement : MonoBehaviour
     [SerializeField] private JumpMovement jm;
     [SerializeField] private SimpleMovement sm;
 
+    [SerializeField] private AirDashState state;
     [SerializeField] private float speedMultiplier = 1.5f;
     [SerializeField] private float threshold = 5;
     [SerializeField] float airFriction = 0.04f;
     [SerializeField] private bool isAirdashing;
     [SerializeField] private Vector3 velocity;
+
+    [SerializeField] private float triggerRadius = 0.1f;
+    
+    private bool isAccelerating;
+
+    private bool startPosSet;
+    private Vector3 handStartPos;
+    private Vector3 direction;
+    
+    
+    // TODO:
+    // Have direction based on vector from starting hand position when button is initially pressed to end position
+    // Still use hand velocity as speed
+    // Fix bug where releasing button doesn't carry over the velocity to the simple movement component
     
     // Update is called once per frame
     void Update()
@@ -27,37 +43,85 @@ public class AirDashMovement : MonoBehaviour
         Check();
         StopConditions();
         Move();
+
     }
+    
 
     void Check()
     {
         if (!InputData.Data.GetRightGripButton()) return;
         if (cc.isGrounded) return;
-        
+
+        // Set Hand Start Position
+        if (!startPosSet && InputData.Data.GetRightGripButton())
+        {
+            handStartPos = InputData.Data.GetRHPosition();
+            startPosSet = true;
+        }
+
         // Trigger Air Dash
-        if (!isAirdashing && Mathf.Abs(InputData.Data.GetRightHandVelocity().magnitude) > threshold)
+        var dist = Vector3.Distance(InputData.Data.GetRHPosition(), handStartPos);
+        if (!isAirdashing && dist > triggerRadius)
         {
             isAirdashing = true;
             velocity = Time.fixedDeltaTime * speedMultiplier * -InputData.Data.GetRightHandVelocity();
+            state = AirDashState.Buffer;
+            print("Buffer State");
         }
 
-        if (isAirdashing)
+        if (state == AirDashState.Buffer || state == AirDashState.Accel)
         {
             var dot = Vector3.Dot(velocity, -InputData.Data.GetRightHandVelocity());
             // Accel
             if (Mathf.Abs(InputData.Data.GetRightHandVelocity().magnitude) > threshold)
             {
+                print("Accel State");
+                state = AirDashState.Accel;
                 velocity += Time.fixedDeltaTime * speedMultiplier * transform.TransformVector(-InputData.Data.GetRightHandVelocity());
             }
+            else if (state == AirDashState.Accel)
+            {
+                print("SlowDown State");
+                state = AirDashState.SlowDown;
+            }
         }
-        
     }
+
+    // void Check()
+    // {
+    //     if (!InputData.Data.GetRightGripButton()) return;
+    //     if (cc.isGrounded) return;
+    //     
+    //     // Trigger Air Dash
+    //     if (!isAirdashing && Mathf.Abs(InputData.Data.GetRightHandVelocity().magnitude) > threshold)
+    //     {
+    //         isAirdashing = true;
+    //         velocity = Time.fixedDeltaTime * speedMultiplier * -InputData.Data.GetRightHandVelocity();
+    //         state = AirDashState.Buffer;
+    //     }
+    //
+    //     if (state == AirDashState.Buffer || state == AirDashState.Accel)
+    //     {
+    //         var dot = Vector3.Dot(velocity, -InputData.Data.GetRightHandVelocity());
+    //         // Accel
+    //         if (Mathf.Abs(InputData.Data.GetRightHandVelocity().magnitude) > threshold)
+    //         {
+    //             state = AirDashState.Accel;
+    //             velocity += Time.fixedDeltaTime * speedMultiplier * transform.TransformVector(-InputData.Data.GetRightHandVelocity());
+    //         }
+    //         else if (state == AirDashState.Accel)
+    //         {
+    //             state = AirDashState.SlowDown;
+    //         }
+    //     }
+    //     
+    // }
 
     void Move()
     {
         if (!isAirdashing) return;
         
-        cc.Move(velocity);
+        cc.Move(velocity * Time.fixedDeltaTime);
     }
 
     void StopConditions()
@@ -65,15 +129,16 @@ public class AirDashMovement : MonoBehaviour
         if (!isAirdashing) return;
         
         // Stop Air Dash
-        if (!InputData.Data.GetRightGripButton() || velocity.magnitude <= airFriction)
+        if (!InputData.Data.GetRightGripButton() || velocity.magnitude <= airFriction * Time.fixedDeltaTime)
         {
             ContinueOtherMoveComponents();
             return;
         }
         
         // Slow Down Air Dash
-        if (velocity.magnitude > airFriction)
+        if (state == AirDashState.SlowDown && velocity.magnitude > airFriction)
         {
+            print("SlowDown State");
             velocity += airFriction * Time.fixedDeltaTime * -velocity.normalized;
             StopOtherMoveComponents();
         }
@@ -93,5 +158,9 @@ public class AirDashMovement : MonoBehaviour
         
         isAirdashing = false;
         velocity = Vector3.zero;
+
+        state = AirDashState.Idle;
+        print("Idle State");
+
     }
 }

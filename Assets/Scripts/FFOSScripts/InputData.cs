@@ -51,7 +51,7 @@ public class InputData : MonoBehaviour
         }
     }
 
-    public bool GetRightButton()
+    public bool GetRightTriggerButton()
     {
         bool value = false;
         RightController.TryGetFeatureValue(CommonUsages.triggerButton, out value);
@@ -83,6 +83,13 @@ public class InputData : MonoBehaviour
     {
         Vector3 value = Vector3.zero;
         HMD.TryGetFeatureValue(CommonUsages.deviceVelocity, out value);
+        return value;
+    }
+    
+    public Vector3 GetRHPosition()
+    {
+        Vector3 value = Vector3.zero;
+        RightController.TryGetFeatureValue(CommonUsages.devicePosition, out value);
         return value;
     }
 

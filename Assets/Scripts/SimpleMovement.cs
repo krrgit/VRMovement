@@ -14,6 +14,7 @@ public class SimpleMovement : MonoBehaviour
     [SerializeField] private float grAccel = 0.1435f;
     [SerializeField] private float grFriction = 0.8f;
     [SerializeField] private float grMaxHorzVel = 3;
+    [SerializeField] private float dashThreshold = 1f;
     [Header("Air")]
     [SerializeField] private float airAccel = 0.1435f;
     [SerializeField] private float airFriction = 0.2f;
@@ -24,6 +25,9 @@ public class SimpleMovement : MonoBehaviour
     [SerializeField] private float curMaxHorzVel = 6;
     private Vector3 horzAccel;
     private Vector3 horzVel;
+        
+    // TODO
+    // Have movement based on input direction but still have friction when stopping
     
     public void SetHorzVelocity(Vector3 vel)
     {
@@ -58,14 +62,27 @@ public class SimpleMovement : MonoBehaviour
     {
         if (cc.isGrounded)
         {
+            
             horzAccel = curAccel * InputData.Data.GetRightTrigger() * Time.fixedDeltaTime * input.HorzDirection;
             horzVel = Vector3.ClampMagnitude(horzVel, curMaxHorzVel - horzAccel.magnitude);
             horzVel += horzAccel;
             
             ClampHorzVel();
+            
+            // Direction Input
+            if (InputData.Data.GetRightTriggerButton())
+            {
+                horzVel = input.HorzDirection * horzVel.magnitude;
+            }
+            
+            // Dash
+            if (horzVel.magnitude < 1 && InputData.Data.GetHMDVelocity().magnitude > dashThreshold)
+            {
+                horzVel = curMaxHorzVel * 1.1f * horzVel.normalized;
+            }
         }
         Friction();
-
+        
         cc.Move(horzVel * Time.fixedDeltaTime);
     }
 
@@ -86,8 +103,8 @@ public class SimpleMovement : MonoBehaviour
     {
         if (input.HorzDirection.magnitude > 0) return;
 
-        horzVel = Vector3.ClampMagnitude(horzVel, horzVel.magnitude - Mathf.Min(horzVel.magnitude, curFriction));
-
+        horzVel = Vector3.ClampMagnitude(horzVel, horzVel.magnitude -
+                                                  (Mathf.Min(horzVel.magnitude, curFriction) * Time.fixedDeltaTime));
     }
 
 }

@@ -58,7 +58,7 @@ public class HMDInputController : MonoBehaviour
     // 1. Get Button Input
     void GetInput()
     {
-        moveInputActive = InputData.Data.GetRightButton();
+        moveInputActive = InputData.Data.GetRightTriggerButton();
         vertVel = InputData.Data.GetHMDVelocity().y;  
     }
 

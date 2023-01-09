@@ -67,7 +67,7 @@ public class JumpMovement : MonoBehaviour
         if (!bufferJump && input.VertVelocity > fullJumpThreshold)
         {
             bufferJump = true;
-            print("buffer");
+            //print("buffer");
         }
         
         if (bufferJump)
@@ -76,11 +76,11 @@ public class JumpMovement : MonoBehaviour
             if (Mathf.Abs(input.VertVelocity) >= curMaxVertVel)
             {
                 vertVelocity += (Mathf.Abs(input.VertVelocity) + (gravity * Time.fixedDeltaTime))* jumpMultiplier * Time.fixedDeltaTime * Vector3.up;
-                print("Jumping");
+                //print("Jumping");
             } // When we stop increasing velocity, stop adding
             else
             {
-                print("buffer stop");
+                //print("buffer stop");
                 bufferJump = false;
                 ++curJumps;
             }
