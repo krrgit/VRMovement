@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 public class JumpMovement : MonoBehaviour
 {
@@ -26,6 +28,11 @@ public class JumpMovement : MonoBehaviour
 
     public bool UseGravity; // Only to be used by outside components
 
+
+    public void SetVelocity(float velocity)
+    {
+        vertVelocity = velocity * Vector3.up;
+    }
 
     public void ToggleGravity(bool state)
     {

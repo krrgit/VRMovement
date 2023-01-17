@@ -2,17 +2,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class HMDInputController : MonoBehaviour
 {
-    [SerializeField] private SphereCollider hmdIdleZone;
+    [SerializeField] private CapsuleCollider hmdIdleZone;
     [SerializeField] private Transform hmd;
+    [SerializeField] private SnapTurnProviderBase snap;
     [SerializeField] private Vector3 initDir;
     [SerializeField] private Vector3 adjustDir;
     [SerializeField] private Vector3 direction;
     [SerializeField] float vertVel;
     private bool moveInputActive;
     bool prevMoveInputActive;
+
+    public void SnapTurn()
+    {
+        //initDir = Quaternion.AngleAxis(snap.TurnAmount, Vector3.up) * initDir;
+        //print("Snap Turn | dir: " + direction + " | turn: " + snap.TurnAmount);
+    }
     
 
     public Vector3 HMDVelocity
@@ -83,15 +91,15 @@ public class HMDInputController : MonoBehaviour
     // 2. Set the position of the zone to the position of the hmd
     void ResetZonePosition()
     {
-        hmdIdleZone.transform.position = hmd.position;
+        hmdIdleZone.transform.localPosition = hmd.localPosition;
     }
 
     // 3. Move head outside of trigger to input
     private void OnTriggerExit(Collider other)
     {
-        print("Head Exit Trigger");
+        print("Head Exit Trigger: " + other.gameObject.name);
         // Input Direction
-        initDir = other.transform.position - transform.position;
+        initDir = other.transform.localPosition - transform.localPosition;
         initDir.y = 0;
         initDir = initDir.normalized;
         ResetZonePosition();
@@ -102,8 +110,9 @@ public class HMDInputController : MonoBehaviour
     void Adjust()
     {
         if (!moveInputActive) return;
-        adjustDir = (hmd.position - hmdIdleZone.transform.position) / hmdIdleZone.radius;
+        adjustDir = (hmd.localPosition - hmdIdleZone.transform.localPosition) / hmdIdleZone.radius;
         adjustDir.y = 0;
         direction = Vector3.ClampMagnitude(initDir + adjustDir, 1.0f);
+        direction = transform.TransformVector(direction);
     }
 }

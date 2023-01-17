@@ -43,7 +43,6 @@ public class AirDashMovement : MonoBehaviour
         Check();
         StopConditions();
         Move();
-
     }
     
 
@@ -52,33 +51,34 @@ public class AirDashMovement : MonoBehaviour
         if (!InputData.Data.GetRightGripButton()) return;
         if (cc.isGrounded) return;
 
-        // Set Hand Start Position
+        //1. Set Hand Start Position
         if (!startPosSet && InputData.Data.GetRightGripButton())
         {
             handStartPos = InputData.Data.GetRHPosition();
             startPosSet = true;
         }
 
-        // Trigger Air Dash
+        //2. Trigger Air Dash
         var dist = Vector3.Distance(InputData.Data.GetRHPosition(), handStartPos);
-        if (!isAirdashing && dist > triggerRadius)
+        if (!isAirdashing && dist > triggerRadius && InputData.Data.GetRightHandVelocity().magnitude > threshold)
         {
             isAirdashing = true;
             velocity = Time.fixedDeltaTime * speedMultiplier * -InputData.Data.GetRightHandVelocity();
             state = AirDashState.Buffer;
             print("Buffer State");
         }
-
+        
         if (state == AirDashState.Buffer || state == AirDashState.Accel)
         {
             var dot = Vector3.Dot(velocity, -InputData.Data.GetRightHandVelocity());
-            // Accel
+            // 3. Add Velocity while increasing speed of controller
             if (Mathf.Abs(InputData.Data.GetRightHandVelocity().magnitude) > threshold)
             {
                 print("Accel State");
                 state = AirDashState.Accel;
                 velocity += Time.fixedDeltaTime * speedMultiplier * transform.TransformVector(-InputData.Data.GetRightHandVelocity());
             }
+            // 4. Slow Down
             else if (state == AirDashState.Accel)
             {
                 print("SlowDown State");
@@ -152,6 +152,7 @@ public class AirDashMovement : MonoBehaviour
 
     void ContinueOtherMoveComponents()
     {
+        jm.SetVelocity(velocity.y);
         velocity.y = 0;
         sm.SetHorzVelocity(velocity);
         jm.ToggleGravity(true);

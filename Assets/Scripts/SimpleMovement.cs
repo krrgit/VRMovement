@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class SimpleMovement : MonoBehaviour
 {
     [SerializeField] private HMDInputController input;
     [SerializeField] private CharacterController cc;
+    [SerializeField] private SnapTurnProviderBase snap;
     [SerializeField] private AnimationCurve speedCurve;
     [Header("Ground")]
     [SerializeField] private float grAccel = 0.1435f;
@@ -25,9 +27,6 @@ public class SimpleMovement : MonoBehaviour
     [SerializeField] private float curMaxHorzVel = 6;
     private Vector3 horzAccel;
     private Vector3 horzVel;
-        
-    // TODO
-    // Have movement based on input direction but still have friction when stopping
     
     public void SetHorzVelocity(Vector3 vel)
     {
@@ -62,7 +61,6 @@ public class SimpleMovement : MonoBehaviour
     {
         if (cc.isGrounded)
         {
-            
             horzAccel = curAccel * InputData.Data.GetRightTrigger() * Time.fixedDeltaTime * input.HorzDirection;
             horzVel = Vector3.ClampMagnitude(horzVel, curMaxHorzVel - horzAccel.magnitude);
             horzVel += horzAccel;
