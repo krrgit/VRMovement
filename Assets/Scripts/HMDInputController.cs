@@ -8,7 +8,6 @@ public class HMDInputController : MonoBehaviour
 {
     [SerializeField] private CapsuleCollider hmdIdleZone;
     [SerializeField] private Transform hmd;
-    [SerializeField] private SnapTurnProviderBase snap;
     [SerializeField] private Vector3 initDir;
     [SerializeField] private Vector3 adjustDir;
     [SerializeField] private Vector3 direction;
@@ -16,12 +15,6 @@ public class HMDInputController : MonoBehaviour
     private bool moveInputActive;
     bool prevMoveInputActive;
 
-    public void SnapTurn()
-    {
-        //initDir = Quaternion.AngleAxis(snap.TurnAmount, Vector3.up) * initDir;
-        //print("Snap Turn | dir: " + direction + " | turn: " + snap.TurnAmount);
-    }
-    
 
     public Vector3 HMDVelocity
     {
