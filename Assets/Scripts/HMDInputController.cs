@@ -18,6 +18,8 @@ public class HMDInputController : MonoBehaviour
 
     private bool doublePressCheck;
     
+    // Issue with this design
+    // Player needs to reset neutral , otherwise sometimes doesn't move in right direcition
 
     public Vector3 HMDVelocity
     {
