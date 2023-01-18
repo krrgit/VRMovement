@@ -15,7 +15,7 @@ public class InputArrow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.forward = input.HorzDirection;
+        transform.forward = input.HorzDirection.magnitude > 0 ? input.HorzDirection : transform.forward;
         transform.localScale = new Vector3(1, 1, input.HorzDirection.magnitude);
         var localPos = Camera.main.transform.localPosition;
         localPos.y = 0;
