@@ -31,12 +31,6 @@ public class AirDashMovement : MonoBehaviour
     private Vector3 handStartPos;
     private Vector3 direction;
     
-    
-    // TODO:
-    // Have direction based on vector from starting hand position when button is initially pressed to end position
-    // Still use hand velocity as speed
-    // Fix bug where releasing button doesn't carry over the velocity to the simple movement component
-    
     // Update is called once per frame
     void Update()
     {
