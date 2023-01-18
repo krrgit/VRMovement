@@ -1889,12 +1889,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c974ce7f9fdef44a956190c60013dc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hmdIdleZone: {fileID: 809931452}
+  lastInputZone: {fileID: 809931452}
   hmd: {fileID: 1324289692}
-  snap: {fileID: 1128618316}
   initDir: {x: 0, y: 0, z: 0}
   adjustDir: {x: 0, y: 0, z: 0}
   direction: {x: 0, y: 0, z: 0}
+  resetNeutralThreshold: 0.5
   vertVel: 0
 --- !u!54 &809931451
 Rigidbody:
@@ -1922,7 +1922,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
-  m_Radius: 0.25
+  m_Radius: 0.15
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
@@ -4822,26 +4822,26 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
-      inSlope: -0.015403983
-      outSlope: -0.015403983
+      value: 2
+      inSlope: -3.0532284
+      outSlope: -3.0532284
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.17020078
+      outWeight: 0.045326516
     - serializedVersion: 3
       time: 1
-      value: 2
-      inSlope: 3.069924
-      outSlope: 3.069924
+      value: 1
+      inSlope: 0.018716652
+      outSlope: 0.018716652
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.08448249
+      inWeight: 0.07507962
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  grAccel: 5
+  grAccel: 6
   grFriction: 0.05
   grMaxHorzVel: 8
   dashThreshold: 5
@@ -4890,7 +4890,7 @@ MonoBehaviour:
   sm: {fileID: 1193332433}
   state: 0
   speedMultiplier: 6
-  threshold: 1.5
+  threshold: 1.25
   airFriction: 4
   isAirdashing: 0
   velocity: {x: 0, y: 0, z: 0}

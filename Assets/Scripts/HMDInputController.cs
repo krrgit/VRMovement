@@ -6,15 +6,23 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class HMDInputController : MonoBehaviour
 {
-    [SerializeField] private CapsuleCollider hmdIdleZone;
+    [SerializeField] private CapsuleCollider lastInputZone;
     [SerializeField] private Transform hmd;
     [SerializeField] private Vector3 initDir;
     [SerializeField] private Vector3 adjustDir;
     [SerializeField] private Vector3 direction;
+    [SerializeField] private float resetNeutralThreshold = 0.5f;
     [SerializeField] float vertVel;
     private bool moveInputActive;
     bool prevMoveInputActive;
 
+
+    private bool doublePressCheck;
+
+    private Vector3 startPos;
+    
+    // Issue with this design
+    // Player needs to reset neutral , otherwise sometimes doesn't move in right direcition
 
     public Vector3 HMDVelocity
     {
@@ -29,9 +37,7 @@ public class HMDInputController : MonoBehaviour
     {
         get
         {
-            var d = direction;
-            d.y = 0;
-            return d;
+            return direction;
         }
     }
     
@@ -39,73 +45,72 @@ public class HMDInputController : MonoBehaviour
     void Update()
     {
         GetInput();
-        
     }
 
     private void FixedUpdate()
     {
-        Adjust();
-        UpdateTrigger();
-    }
-
-    // Avoid Issues with moving up and down
-    void UpdateTriggerYPos()
-    {
-        var pos = transform.localPosition;
-        pos.y = hmd.localPosition.y;
-        transform.localPosition = pos;
+        GetTilt();
+        ResetNeutralCheck();
+        TrackLastActiveHMDPosition();
+        
+        prevMoveInputActive = moveInputActive;
     }
 
     // 1. Get Button Input
     void GetInput()
     {
         moveInputActive = InputData.Data.GetRightTriggerButton();
-        vertVel = InputData.Data.GetHMDVelocity().y;  
+        vertVel = InputData.Data.GetHMDVelocity().y;
     }
-
-    void UpdateTrigger()
+    
+    // 2. Check if neutral needs to be reset
+    void ResetNeutralCheck()
     {
-        hmdIdleZone.enabled = moveInputActive;
-        
-        if (moveInputActive != prevMoveInputActive)
+        // On Trigger Up/Down
+        if (prevMoveInputActive != moveInputActive)
         {
-            ResetZonePosition();
-            prevMoveInputActive = moveInputActive;
+            var dist = (hmd.localPosition - lastInputZone.transform.localPosition);
+            dist.y = 0;
+            var thisDir = (hmd.localPosition - startPos);
+            thisDir.y = 0;
+            
+            // Reset if Close to start position || Outside Last Input Zone
+            if (thisDir.magnitude <= lastInputZone.radius || dist.magnitude > lastInputZone.radius)
+            {
+                SetNeutral();
+            }
         }
+    }
 
-        if (!moveInputActive)
+    void SetNeutral()
+    {
+        startPos = hmd.localPosition;
+    }
+
+    // 3.Track the last position of the headset while moving. Used in ResetNeutralCheck()
+    void TrackLastActiveHMDPosition()
+    {
+        if (moveInputActive)
         {
-            initDir = adjustDir = direction = Vector3.zero;
+            lastInputZone.transform.localPosition = hmd.localPosition;
         }
-        
-        UpdateTriggerYPos();
-    }
-
-    // 2. Set the position of the zone to the position of the hmd
-    void ResetZonePosition()
-    {
-        hmdIdleZone.transform.localPosition = hmd.localPosition;
-    }
-
-    // 3. Move head outside of trigger to input
-    private void OnTriggerExit(Collider other)
-    {
-        print("Head Exit Trigger: " + other.gameObject.name);
-        // Input Direction
-        initDir = other.transform.localPosition - transform.localPosition;
-        initDir.y = 0;
-        initDir = initDir.normalized;
-        ResetZonePosition();
     }
     
     
-    // 4. Adjust input when hmd moves inside the trigger
-    void Adjust()
+    // 4. Get Tilt Direction
+    void GetTilt()
     {
         if (!moveInputActive) return;
-        adjustDir = (hmd.localPosition - hmdIdleZone.transform.localPosition) / hmdIdleZone.radius;
-        adjustDir.y = 0;
-        direction = Vector3.ClampMagnitude(initDir + adjustDir, 1.0f);
+        var vector = (hmd.localPosition - startPos) / lastInputZone.radius;
+        vector.y = 0;
+
+        var proj = Vector3.Project(vector, direction);
+        var horz = vector - proj;
+        horz *= 0.67f;
+
+        vector = proj + horz;
+
+        direction = Vector3.ClampMagnitude(vector, 1.0f);
         direction = transform.TransformVector(direction);
     }
 }

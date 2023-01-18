@@ -28,16 +28,10 @@ public class JumpMovement : MonoBehaviour
 
     public bool UseGravity; // Only to be used by outside components
 
-
-    public void SetVelocity(float velocity)
-    {
-        vertVelocity = velocity * Vector3.up;
-    }
-
-    public void ToggleGravity(bool state)
+    public void ToggleGravity(bool state, float velocity)
     {
         UseGravity = state;
-        vertVelocity = Vector3.zero;
+        vertVelocity = velocity * Vector3.up;
     }
 
     // Update is called once per frame

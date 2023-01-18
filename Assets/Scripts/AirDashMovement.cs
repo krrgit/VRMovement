@@ -136,7 +136,7 @@ public class AirDashMovement : MonoBehaviour
         }
         
         // Slow Down Air Dash
-        if (state == AirDashState.SlowDown && velocity.magnitude > airFriction)
+        if (velocity.magnitude >= airFriction * Time.fixedDeltaTime)
         {
             print("SlowDown State");
             velocity += airFriction * Time.fixedDeltaTime * -velocity.normalized;
@@ -147,15 +147,14 @@ public class AirDashMovement : MonoBehaviour
     void StopOtherMoveComponents()
     {
         sm.SetHorzVelocity(Vector3.zero);
-        jm.ToggleGravity(false);
+        jm.ToggleGravity(false, 0);
     }
 
     void ContinueOtherMoveComponents()
     {
-        jm.SetVelocity(velocity.y);
         velocity.y = 0;
+        jm.ToggleGravity(true, velocity.y);
         sm.SetHorzVelocity(velocity);
-        jm.ToggleGravity(true);
         
         isAirdashing = false;
         velocity = Vector3.zero;
