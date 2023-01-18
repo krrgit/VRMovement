@@ -1889,11 +1889,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c974ce7f9fdef44a956190c60013dc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hmdIdleZone: {fileID: 809931452}
+  lastInputZone: {fileID: 809931452}
   hmd: {fileID: 1324289692}
   initDir: {x: 0, y: 0, z: 0}
   adjustDir: {x: 0, y: 0, z: 0}
   direction: {x: 0, y: 0, z: 0}
+  resetNeutralThreshold: 0.5
   vertVel: 0
 --- !u!54 &809931451
 Rigidbody:
@@ -4889,7 +4890,7 @@ MonoBehaviour:
   sm: {fileID: 1193332433}
   state: 0
   speedMultiplier: 6
-  threshold: 1.5
+  threshold: 1.25
   airFriction: 4
   isAirdashing: 0
   velocity: {x: 0, y: 0, z: 0}
